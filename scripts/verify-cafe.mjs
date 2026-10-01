@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+const base='http://127.0.0.1:5173';
+async function call(body,cookie=''){const r=await fetch(base+'/api/cafe',{method:body?'POST':'GET',headers:{'Content-Type':'application/json',...(cookie?{cookie}:{})},...(body?{body:JSON.stringify(body)}:{})});return {status:r.status,data:await r.json()};}
+const guest=await call();assert.equal(guest.status,200);assert.equal(guest.data.role,'customer');
+assert.equal((await call({action:'settings',settings:{name:'bad'}})).status,403);
+assert.equal((await call({action:'setup'})).status,401);
+const payload={action:'order',requestId:crypto.randomUUID(),name:'API test guest',mode:'Dine-in',table:'7',items:[{id:'latte',qty:2}],total:1};
+const created=await call(payload);assert.equal(created.status,200);assert.equal(created.data.order.total,36000);
+assert.equal((await call(payload)).data.order.id,created.data.order.id);
+assert.equal((await call({...payload,requestId:crypto.randomUUID(),items:[{id:'latte',qty:-1}]})).status,400);
+assert.equal((await fetch(base+'/api/cafe?order='+created.data.order.id)).status,404);
+assert.equal((await fetch(base+'/api/cafe?order='+created.data.order.id+'&token='+created.data.token)).status,200);
+const login=await fetch(base+'/signin-with-chatgpt?return_to=/',{redirect:'manual'});const cookie=login.headers.getSetCookie().map(v=>v.split(';')[0]).join('; ');assert.ok(cookie);
+const setup=await call({action:'setup'},cookie);assert.ok([200,409].includes(setup.status));
+const admin=await call(undefined,cookie);assert.equal(admin.data.role,'admin');
+const item={id:'test-item',name:'Test item',description:'For automated local verification',category:'Coffee',price:99.99,veg:true,available:false,image:''};assert.equal((await call({action:'item',item},cookie)).status,200);
+assert.equal((await call({...payload,requestId:crypto.randomUUID(),items:[{id:item.id,qty:1}]})).status,400);
+assert.equal((await call({action:'status',id:created.data.order.id,payment:'Paid',status:'Completed'},cookie)).status,200);
+const paid=(await call(undefined,cookie)).data.orders.find(o=>o.id===created.data.order.id);assert.equal(paid.payment,'Paid');assert.equal(paid.total,36000);
+console.log('PASS: menu, staff authorization, server prices, idempotency, invalid quantities, order privacy, owner sign-in, item persistence, sold-out protection, payment and status updates.');
