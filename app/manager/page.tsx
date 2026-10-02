@@ -1,13 +1,2 @@
-import {notFound, redirect} from 'next/navigation';
 import Cafe from '../cafe-client';
-import {cafeContext} from '../cafe-access';
-import {chatGPTSignInPath} from '../chatgpt-auth';
-import {roleHome} from '../access-policy';
-export const dynamic = 'force-dynamic';
-export default async function ManagerPage() {
-  const context = await cafeContext();
-  if (!context.user) redirect(chatGPTSignInPath('/manager'));
-  if (context.role === 'customer') notFound();
-  if (context.role !== 'manager') redirect(roleHome(context.role));
-  return <Cafe surface="manager"/>;
-}
+export default function Page(){return <Cafe surface="manager"/>;}

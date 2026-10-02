@@ -1,0 +1,6 @@
+legacy/
+.sites-runtime/
+.wrangler/
+.vinext/
+dist/
+tests/

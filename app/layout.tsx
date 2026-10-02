@@ -4,9 +4,6 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Brew & Bloom · Freshly made, happily served",
   description: "Explore the menu, order at your table, and enjoy Brew & Bloom café.",
-  other: {
-    "codex-preview": "development",
-  },
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
