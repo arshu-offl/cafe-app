@@ -28,8 +28,10 @@ npm start
 1. Push this project to your own GitHub/GitLab/Bitbucket repository. The existing `origin` belongs to the previous Sites deployment; do not push this migration there. Add a new remote for your repository, or upload the source to a new repository.
 2. Import the repository in Vercel using Add New → Project.
 3. Set Root Directory to `cafe` if importing the parent CafeDashboard folder. If the repository itself starts with this package.json, leave Root Directory at the repository root.
-4. Framework: Next.js. Build command: `npm run build`. Output directory: `out`. Use Node.js 22.x. These build settings are also in vercel.json.
+4. Framework Preset: **Other**. Build command: `npm run build`. Output directory: `out`. Use Node.js 22.x. `vercel.json` sets `framework: null` to disable the Next.js server adapter and deploy the exported files as a static site.
 5. Deploy. No environment variables or database setup are needed.
+
+If an existing Vercel project reports `out/routes-manifest.json` missing, push the updated `vercel.json`, change its Framework Preset to **Other**, and redeploy. Keep `out` as the output directory and `output: 'export'` in `next.config.ts`. Do not copy manifests into `out`: the static export has no server manifest requirement.
 
 Alternatively, from this directory use `npx vercel` for a preview or `npx vercel --prod` for production, following the sign-in/project prompts. The Vercel CLI must be connected to your account. This migration does not automatically deploy to Vercel or replace the existing Sites-hosted version.
 
